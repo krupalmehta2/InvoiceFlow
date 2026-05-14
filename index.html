@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InvoiceFlow — Professional Invoice Generator</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ─────────────────────────────────────────
+     NAVBAR
+───────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+      <div class="brand-icon"><i class="bi bi-receipt-cutoff"></i></div>
+      <span class="brand-name">InvoiceFlow</span>
+    </a>
+
+    <div class="d-flex align-items-center gap-3 ms-auto">
+      <!-- Currency Selector -->
+      <div class="currency-wrap d-none d-sm-flex align-items-center gap-2">
+        <i class="bi bi-currency-exchange nav-icon"></i>
+        <select id="currencySelect" class="form-select form-select-sm nav-select">
+          <option value="₹">₹ INR</option>
+          <option value="$">$ USD</option>
+          <option value="€">€ EUR</option>
+          <option value="£">£ GBP</option>
+          <option value="¥">¥ JPY</option>
+          <option value="AED">AED</option>
+        </select>
+      </div>
+
+      <!-- Dark Mode Toggle -->
+      <button class="btn btn-icon" id="themeToggle" title="Toggle Dark Mode">
+        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+      </button>
+
+      <!-- Save Draft -->
+      <button class="btn btn-outline-accent d-none d-md-inline-flex align-items-center gap-2" id="navSaveDraft">
+        <i class="bi bi-floppy2"></i> Save Draft
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ─────────────────────────────────────────
+     HERO SECTION
+───────────────────────────────────────── -->
+<section class="hero-section">
+  <div class="container-fluid px-4">
+    <div class="hero-inner d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h1 class="hero-title">Professional Invoices<br><span class="hero-accent">in seconds.</span></h1>
+        <p class="hero-sub">Create, preview, and download GST-compliant invoices — free forever.</p>
+      </div>
+      <div class="d-flex gap-3 flex-wrap">
+        <button class="btn btn-primary-grad" onclick="document.getElementById('invoiceSection').scrollIntoView({behavior:'smooth'})">
+          <i class="bi bi-plus-circle me-2"></i>Create Invoice
+        </button>
+        <button class="btn btn-outline-accent" onclick="document.getElementById('profileSection').scrollIntoView({behavior:'smooth'})">
+          <i class="bi bi-building me-2"></i>Setup Business
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────
+     MAIN CONTENT
+───────────────────────────────────────── -->
+<div class="container-fluid px-4 main-content">
+  <div class="row g-4">
+
+    <!-- ═══════════════════════════════════
+         LEFT PANEL — FORMS
+    ═══════════════════════════════════ -->
+    <div class="col-xl-7">
+
+      <!-- ── BUSINESS PROFILE ── -->
+      <div class="card-section" id="profileSection">
+        <div class="section-header">
+          <div class="section-icon"><i class="bi bi-building-fill"></i></div>
+          <div>
+            <h2 class="section-title">Business Profile</h2>
+            <p class="section-sub">Saved automatically to your browser</p>
+          </div>
+          <button class="btn btn-icon ms-auto" data-bs-toggle="collapse" data-bs-target="#profileBody" aria-expanded="true">
+            <i class="bi bi-chevron-up" id="profileChevron"></i>
+          </button>
+        </div>
+
+        <div class="collapse show" id="profileBody">
+          <div class="section-body">
+            <!-- Logo -->
+            <div class="logo-upload-area mb-4">
+              <div class="logo-preview-wrap" id="logoPreviewWrap">
+                <img id="logoPreview" src="" alt="Logo" style="display:none;" />
+                <div id="logoPlaceholder" class="logo-placeholder">
+                  <i class="bi bi-image"></i>
+                  <span>Logo Preview</span>
+                </div>
+              </div>
+              <div class="flex-grow-1">
+                <label class="form-label">Logo URL</label>
+                <input type="url" id="bLogoUrl" class="form-control" placeholder="https://your-logo-url.com/logo.png" />
+                <div class="form-text">Paste a direct image URL to preview your logo</div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Business Name <span class="req">*</span></label>
+                <input type="text" id="bName" class="form-control" placeholder="A2Z Clicks Digital" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Owner Name</label>
+                <input type="text" id="bOwner" class="form-control" placeholder="Krupal Shah" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">GST Number</label>
+                <input type="text" id="bGst" class="form-control" placeholder="22AAAAA0000A1Z5" maxlength="15" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="bPhone" class="form-control" placeholder="+91 98765 43210" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" id="bEmail" class="form-control" placeholder="hello@a2zclicks.in" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Website</label>
+                <input type="url" id="bWebsite" class="form-control" placeholder="https://a2zclicksdigital.in" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <textarea id="bAddress" class="form-control" rows="2" placeholder="Street, City, State, PIN"></textarea>
+              </div>
+
+              <!-- Bank Details -->
+              <div class="col-12"><div class="divider-label"><span>Bank Details</span></div></div>
+
+              <div class="col-md-6">
+                <label class="form-label">Bank Name</label>
+                <input type="text" id="bBankName" class="form-control" placeholder="HDFC Bank" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Account Number</label>
+                <input type="text" id="bAccNo" class="form-control" placeholder="XXXXXXXXXXXX" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">IFSC Code</label>
+                <input type="text" id="bIfsc" class="form-control" placeholder="HDFC0001234" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">UPI ID</label>
+                <input type="text" id="bUpi" class="form-control" placeholder="business@upi" />
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-primary-grad" id="saveProfileBtn" onclick="saveProfile()">
+                <i class="bi bi-check2-circle me-2"></i>Save Business Profile
+              </button>
+              <button class="btn btn-outline-ghost" onclick="clearProfile()">
+                <i class="bi bi-x-circle me-2"></i>Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── INVOICE FORM ── -->
+      <div class="card-section mt-4" id="invoiceSection">
+        <div class="section-header">
+          <div class="section-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+          <div>
+            <h2 class="section-title">Invoice Details</h2>
+            <p class="section-sub">Fill in client and line items</p>
+          </div>
+        </div>
+
+        <div class="section-body">
+
+          <!-- Invoice Meta -->
+          <div class="meta-strip">
+            <div class="meta-field">
+              <label class="form-label">Invoice Number</label>
+              <input type="text" id="invNumber" class="form-control" readonly />
+            </div>
+            <div class="meta-field">
+              <label class="form-label">Invoice Date</label>
+              <input type="date" id="invDate" class="form-control" />
+            </div>
+            <div class="meta-field">
+              <label class="form-label">Due Date</label>
+              <input type="date" id="invDueDate" class="form-control" />
+            </div>
+          </div>
+
+          <!-- Client Details -->
+          <div class="divider-label mt-4"><span>Client Details</span></div>
+
+          <div class="row g-3 mt-1">
+            <div class="col-md-6">
+              <label class="form-label">Client Name <span class="req">*</span></label>
+              <input type="text" id="cName" class="form-control" placeholder="Acme Corporation" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Client Phone</label>
+              <input type="tel" id="cPhone" class="form-control" placeholder="+91 98765 43210" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Client Email</label>
+              <input type="email" id="cEmail" class="form-control" placeholder="billing@acme.com" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Client GST Number</label>
+              <input type="text" id="cGst" class="form-control" placeholder="22BBBBB1111B2Z3" maxlength="15" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Client Address</label>
+              <textarea id="cAddress" class="form-control" rows="2" placeholder="Client street, city, state, PIN"></textarea>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <div class="divider-label mt-4"><span>Line Items</span></div>
+
+          <div class="table-responsive mt-3">
+            <table class="table items-table" id="itemsTable">
+              <thead>
+                <tr>
+                  <th style="min-width:160px">Item Name</th>
+                  <th style="min-width:180px">Description</th>
+                  <th style="min-width:80px">Qty</th>
+                  <th style="min-width:110px">Price</th>
+                  <th style="min-width:90px">GST %</th>
+                  <th style="min-width:110px">Total</th>
+                  <th style="min-width:50px"></th>
+                </tr>
+              </thead>
+              <tbody id="itemsBody">
+                <!-- rows added by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <button class="btn btn-outline-accent btn-sm mt-2" id="addItemBtn" onclick="addItem()">
+            <i class="bi bi-plus-lg me-1"></i>Add Item
+          </button>
+
+          <!-- Summary -->
+          <div class="summary-box mt-4">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="summarySubtotal">₹ 0.00</span>
+            </div>
+            <div class="summary-row">
+              <span>GST</span>
+              <span id="summaryGst">₹ 0.00</span>
+            </div>
+            <div class="summary-row total-row">
+              <span>Grand Total</span>
+              <span id="summaryGrand">₹ 0.00</span>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="divider-label mt-4"><span>Notes & Terms</span></div>
+          <div class="row g-3 mt-1">
+            <div class="col-md-6">
+              <label class="form-label">Notes</label>
+              <textarea id="invNotes" class="form-control" rows="3" placeholder="Thank you for your business! Payment is due within 15 days."></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Terms & Conditions</label>
+              <textarea id="invTerms" class="form-control" rows="3" placeholder="Goods once sold will not be taken back. Subject to local jurisdiction."></textarea>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons mt-4">
+            <button class="btn btn-primary-grad" onclick="printInvoice()">
+              <i class="bi bi-printer-fill me-2"></i>Print
+            </button>
+            <button class="btn btn-success-grad" onclick="downloadPDF()">
+              <i class="bi bi-file-earmark-pdf-fill me-2"></i>Download PDF
+            </button>
+            <button class="btn btn-outline-accent" onclick="saveDraft()">
+              <i class="bi bi-floppy2 me-2"></i>Save Draft
+            </button>
+            <button class="btn btn-outline-ghost" onclick="clearInvoice()">
+              <i class="bi bi-arrow-counterclockwise me-2"></i>Clear Invoice
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left col -->
+
+    <!-- ═══════════════════════════════════
+         RIGHT PANEL — LIVE PREVIEW
+    ═══════════════════════════════════ -->
+    <div class="col-xl-5">
+      <div class="preview-sticky">
+        <div class="card-section preview-card">
+          <div class="section-header">
+            <div class="section-icon"><i class="bi bi-eye-fill"></i></div>
+            <div>
+              <h2 class="section-title">Live Preview</h2>
+              <p class="section-sub">Updates as you type</p>
+            </div>
+          </div>
+          <div class="section-body p-0">
+            <div id="invoicePreview" class="invoice-preview">
+              <!-- ─── INVOICE DOCUMENT ─── -->
+              <div id="invoiceDocument">
+
+                <!-- Header -->
+                <div class="inv-header">
+                  <div class="inv-brand">
+                    <img id="prev_logo" src="" alt="" style="display:none; max-height:60px; max-width:180px; object-fit:contain; border-radius:6px;" />
+                    <div>
+                      <div class="inv-company-name" id="prev_bName">Your Business Name</div>
+                      <div class="inv-company-sub" id="prev_bOwner"></div>
+                    </div>
+                  </div>
+                  <div class="inv-title-block">
+                    <div class="inv-title-text">INVOICE</div>
+                    <div class="inv-number" id="prev_invNumber">INV-2026-001</div>
+                  </div>
+                </div>
+
+                <!-- Meta Row -->
+                <div class="inv-meta-row">
+                  <div>
+                    <div class="inv-meta-label">Invoice Date</div>
+                    <div class="inv-meta-val" id="prev_invDate">—</div>
+                  </div>
+                  <div>
+                    <div class="inv-meta-label">Due Date</div>
+                    <div class="inv-meta-val" id="prev_invDueDate">—</div>
+                  </div>
+                  <div>
+                    <div class="inv-meta-label">GST No.</div>
+                    <div class="inv-meta-val" id="prev_bGst">—</div>
+                  </div>
+                </div>
+
+                <!-- From / To -->
+                <div class="inv-parties">
+                  <div class="inv-party from-party">
+                    <div class="party-label">FROM</div>
+                    <div class="party-name" id="prev_bName2">—</div>
+                    <div class="party-detail" id="prev_bAddress">—</div>
+                    <div class="party-detail" id="prev_bPhone">—</div>
+                    <div class="party-detail" id="prev_bEmail">—</div>
+                  </div>
+                  <div class="inv-party to-party">
+                    <div class="party-label">TO</div>
+                    <div class="party-name" id="prev_cName">—</div>
+                    <div class="party-detail" id="prev_cAddress">—</div>
+                    <div class="party-detail" id="prev_cPhone">—</div>
+                    <div class="party-detail" id="prev_cEmail">—</div>
+                    <div class="party-detail" id="prev_cGst"></div>
+                  </div>
+                </div>
+
+                <!-- Items Table -->
+                <table class="inv-items-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Item</th>
+                      <th>Qty</th>
+                      <th>Price</th>
+                      <th>GST</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="prev_itemsBody">
+                    <tr><td colspan="6" class="text-center text-muted py-3" style="font-size:12px;">Add items to see them here</td></tr>
+                  </tbody>
+                </table>
+
+                <!-- Totals -->
+                <div class="inv-totals">
+                  <div class="inv-total-row">
+                    <span>Subtotal</span>
+                    <span id="prev_subtotal">—</span>
+                  </div>
+                  <div class="inv-total-row">
+                    <span>GST</span>
+                    <span id="prev_gst">—</span>
+                  </div>
+                  <div class="inv-total-row grand">
+                    <span>GRAND TOTAL</span>
+                    <span id="prev_grand">—</span>
+                  </div>
+                </div>
+
+                <!-- Bank + Notes -->
+                <div class="inv-footer-grid">
+                  <div class="inv-bank">
+                    <div class="inv-section-label">Bank Details</div>
+                    <div class="inv-bank-detail"><span>Bank:</span><span id="prev_bBankName">—</span></div>
+                    <div class="inv-bank-detail"><span>A/C No:</span><span id="prev_bAccNo">—</span></div>
+                    <div class="inv-bank-detail"><span>IFSC:</span><span id="prev_bIfsc">—</span></div>
+                    <div class="inv-bank-detail"><span>UPI:</span><span id="prev_bUpi">—</span></div>
+                  </div>
+                  <div class="inv-notes-wrap">
+                    <div id="prev_notesBlock" style="display:none">
+                      <div class="inv-section-label">Notes</div>
+                      <div class="inv-notes-text" id="prev_notes"></div>
+                    </div>
+                    <div id="prev_termsBlock" style="display:none">
+                      <div class="inv-section-label mt-2">Terms</div>
+                      <div class="inv-notes-text" id="prev_terms"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Signature Line -->
+                <div class="inv-sign">
+                  <div class="inv-sign-line">Authorised Signatory</div>
+                  <div class="inv-sign-name" id="prev_signName"></div>
+                </div>
+
+              </div><!-- /invoiceDocument -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /right col -->
+
+  </div><!-- /row -->
+</div><!-- /main-content -->
+
+<!-- ─────────────────────────────────────────
+     TOAST
+───────────────────────────────────────── -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+  <div id="appToast" class="toast align-items-center" role="alert">
+    <div class="d-flex">
+      <div class="toast-body" id="toastMsg">Saved!</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────
+     FOOTER
+───────────────────────────────────────── -->
+<footer class="site-footer">
+  <div class="container-fluid px-4">
+    <div class="footer-inner d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <span class="footer-brand"><i class="bi bi-receipt-cutoff me-2"></i>InvoiceFlow</span>
+      <span class="footer-copy">© 2026 · Built for A2Z Clicks Digital · All data stored locally in your browser.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ─────────────────────────────────────────
+     SCRIPTS
+───────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
