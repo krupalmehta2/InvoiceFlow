@@ -1,0 +1,28 @@
+# Firebase Configuration (SENSITIVE - DO NOT COMMIT)
+firebaseConfig.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build
+dist/
+build/
+.env.local
+.env
+
+# Logs
+*.log
+npm-debug.log*

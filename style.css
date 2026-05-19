@@ -531,6 +531,17 @@ textarea.form-control { resize: vertical; min-height: 68px; }
   transform: translateY(-1px);
 }
 
+.seo-callout {
+  background: rgba(108,71,255,0.07);
+  color: var(--text-primary);
+  border-top: 1px solid rgba(108,71,255,0.12);
+  border-bottom: 1px solid rgba(108,71,255,0.12);
+}
+
+.seo-callout .btn {
+  min-width: 220px;
+}
+
 .btn-icon {
   background: var(--bg-card-alt);
   border: 1.5px solid var(--border);
@@ -835,14 +846,16 @@ textarea.form-control { resize: vertical; min-height: 68px; }
    PRINT STYLES
 ══════════════════════════════════════ */
 @media print {
-  body * { visibility: hidden; }
-  #invoiceDocument, #invoiceDocument * { visibility: visible; }
+  body * { visibility: hidden !important; }
+  #invoiceDocument, #invoiceDocument * { visibility: visible !important; }
   #invoiceDocument {
-    position: fixed;
-    left: 0; top: 0;
-    width: 100%;
-    box-shadow: none;
-    margin: 0; padding: 20mm;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 20mm !important;
   }
 }
 
@@ -893,3 +906,255 @@ textarea.form-control { resize: vertical; min-height: 68px; }
 }
 
 .save-success { animation: pulseGreen 0.6s ease-out; }
+
+/* ══════════════════════════════════════
+   FIREBASE AUTH UI STYLES
+══════════════════════════════════════ */
+
+/* Auth Container */
+#authContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.user-email {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Sync Indicator */
+.sync-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: rgba(16, 185, 129, 0.08);
+  color: #10b981;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.sync-indicator.syncing {
+  background: rgba(108, 71, 255, 0.08);
+  color: var(--accent);
+}
+
+.sync-indicator.error {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+}
+
+/* My Invoices Button */
+#myInvoicesBtn {
+  font-size: 0.85rem;
+}
+
+/* Guest Mode Notice */
+#guestContainer {
+  background: #f0f9ff;
+  border-color: #0ea5e9;
+  color: #0369a1;
+  font-size: 0.85rem;
+  padding: 0.75rem 1rem;
+}
+
+[data-theme="dark"] #guestContainer {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: #0891b2;
+  color: #06b6d4;
+}
+
+/* Modal Styles */
+#myInvoicesModal .modal-content {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+#myInvoicesModal .modal-header {
+  border-bottom-color: var(--border);
+}
+
+#myInvoicesModal .modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+#invoicesList .list-group {
+  gap: 0.75rem;
+}
+
+.list-group-item {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.list-group-item:hover {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  transform: translateX(4px);
+}
+
+.list-group-item strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.list-group-item .text-muted,
+.list-group-item div[style*="color:#9ca3af"] {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.list-group-item .btn-group {
+  gap: 0.3rem;
+}
+
+.list-group-item .btn-group .btn {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+/* Confirm Dialog Modal */
+#confirmModal .modal-content {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+#confirmModal .modal-header {
+  border-bottom-color: var(--border);
+}
+
+#confirmModal .modal-title {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+#confirmModal .modal-body {
+  color: var(--text-secondary);
+}
+
+#confirmModal .modal-footer {
+  border-top-color: var(--border);
+}
+
+/* Google Sign-In Button */
+#googleSignInBtn {
+  background: var(--grad-primary);
+  border: none;
+  color: #fff;
+  padding: 0.65rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(108, 71, 255, 0.3);
+  transition: all 0.2s;
+}
+
+#googleSignInBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 71, 255, 0.4);
+}
+
+#googleSignInBtn:active {
+  transform: translateY(0);
+}
+
+#googleSignInBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Logout Button */
+#logoutBtn {
+  border-color: #ef4444;
+  color: #ef4444;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+#logoutBtn:hover {
+  background: #fef2f2;
+}
+
+[data-theme="dark"] #logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Loading Spinner */
+#appLoader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] #appLoader {
+  background: rgba(22, 26, 36, 0.95);
+}
+
+/* Spinner Animation */
+.spinner-border {
+  color: var(--accent);
+}
+
+/* Modal Responsive */
+@media (max-width: 576px) {
+  #myInvoicesModal .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  #authContainer {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .user-info {
+    display: none;
+  }
+  
+  #myInvoicesBtn {
+    display: none !important;
+  }
+}

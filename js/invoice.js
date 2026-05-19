@@ -1,18 +1,27 @@
-/* ═══════════════════════════════════════════════════════════
-   InvoiceFlow — script.js
-   Professional Invoice Generator
-   ═══════════════════════════════════════════════════════════ */
+/**
+ * ═══════════════════════════════════════════════════════════
+ * InvoiceFlow — invoice.js
+ * Invoice Creation, Calculation & Management
+ * ═══════════════════════════════════════════════════════════
+ */
 
-/* ──────────────────────────────────────────
-   STATE
-────────────────────────────────────────── */
+import { isUserLoggedIn, saveBusinessProfileToFirestore } from './app.js';
+import { escapeHtml, formatDate, showToast } from './ui.js';
+
+/**
+ * ───────────────────────────────────────────
+ * STATE
+ * ───────────────────────────────────────────
+ */
 let currency = '₹';
 let itemCount = 0;
 
-/* ──────────────────────────────────────────
-   DOM READY — INIT
-────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * ───────────────────────────────────────────
+ * INIT — CALLED ON PAGE LOAD
+ * ───────────────────────────────────────────
+ */
+export function initInvoice() {
   initTheme();
   initCurrency();
   loadProfile();
@@ -20,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDraft();
   bindProfileLogo();
   bindNavSaveDraft();
+  bindSaveProfileBtn();
 
   // Start with 2 default item rows
   addItem();
@@ -27,11 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Listen to all form inputs to update live preview
   bindLivePreview();
-});
+  
+  console.log('✅ Invoice module initialized');
+}
 
-/* ──────────────────────────────────────────
-   THEME — DARK / LIGHT TOGGLE
-────────────────────────────────────────── */
+/**
+ * ───────────────────────────────────────────
+ * THEME — DARK / LIGHT TOGGLE
+ * ───────────────────────────────────────────
+ */
 function initTheme() {
   const saved = localStorage.getItem('invoiceflow_theme') || 'light';
   applyTheme(saved);
@@ -46,14 +60,19 @@ function applyTheme(theme) {
   localStorage.setItem('invoiceflow_theme', theme);
 }
 
-document.getElementById('themeToggle').addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  applyTheme(current === 'dark' ? 'light' : 'dark');
-});
+const themeToggle = document.getElementById('themeToggle');
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+}
 
-/* ──────────────────────────────────────────
-   CURRENCY SELECTOR
-────────────────────────────────────────── */
+/**
+ * ───────────────────────────────────────────
+ * CURRENCY SELECTOR
+ * ───────────────────────────────────────────
+ */
 function initCurrency() {
   const saved = localStorage.getItem('invoiceflow_currency') || '₹';
   currency = saved;
@@ -62,37 +81,47 @@ function initCurrency() {
   updateAllTotals();
 }
 
-document.getElementById('currencySelect').addEventListener('change', function () {
-  currency = this.value;
-  localStorage.setItem('invoiceflow_currency', currency);
-  updateAllTotals();
-  updatePreview();
-});
+const currencySelect = document.getElementById('currencySelect');
+if (currencySelect) {
+  currencySelect.addEventListener('change', function () {
+    currency = this.value;
+    localStorage.setItem('invoiceflow_currency', currency);
+    updateAllTotals();
+    updatePreview();
+  });
+}
 
-/* ──────────────────────────────────────────
-   INVOICE META — Number / Dates
-────────────────────────────────────────── */
+/**
+ * ───────────────────────────────────────────
+ * INVOICE META — Number / Dates
+ * ───────────────────────────────────────────
+ */
 function initInvoiceMeta() {
   // Auto invoice number
   const savedCount = parseInt(localStorage.getItem('invoiceflow_invCount') || '0') + 1;
   const year = new Date().getFullYear();
   const paddedCount = String(savedCount).padStart(3, '0');
   const invNumber = `INV-${year}-${paddedCount}`;
-  document.getElementById('invNumber').value = invNumber;
+  const invNumberEl = document.getElementById('invNumber');
+  if (invNumberEl) invNumberEl.value = invNumber;
 
   // Auto current date
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('invDate').value = today;
+  const invDateEl = document.getElementById('invDate');
+  if (invDateEl) invDateEl.value = today;
 
   // Due date +15 days
   const due = new Date();
   due.setDate(due.getDate() + 15);
-  document.getElementById('invDueDate').value = due.toISOString().split('T')[0];
+  const invDueDateEl = document.getElementById('invDueDate');
+  if (invDueDateEl) invDueDateEl.value = due.toISOString().split('T')[0];
 }
 
-/* ──────────────────────────────────────────
-   BUSINESS PROFILE
-────────────────────────────────────────── */
+/**
+ * ───────────────────────────────────────────
+ * BUSINESS PROFILE
+ * ───────────────────────────────────────────
+ */
 const PROFILE_FIELDS = [
   'bName','bOwner','bGst','bPhone','bEmail','bWebsite',
   'bAddress','bBankName','bAccNo','bIfsc','bUpi','bLogoUrl'
@@ -104,18 +133,27 @@ function saveProfile() {
     const el = document.getElementById(id);
     if (el) profile[id] = el.value.trim();
   });
+  
   localStorage.setItem('invoiceflow_profile', JSON.stringify(profile));
 
   // Animate button
   const btn = document.getElementById('saveProfileBtn');
-  btn.classList.add('save-success');
-  btn.innerHTML = '<i class="bi bi-check2-circle me-2"></i>Saved!';
-  setTimeout(() => {
-    btn.classList.remove('save-success');
-    btn.innerHTML = '<i class="bi bi-check2-circle me-2"></i>Save Business Profile';
-  }, 1800);
+  if (btn) {
+    btn.classList.add('save-success');
+    btn.innerHTML = '<i class="bi bi-check2-circle me-2"></i>Saved!';
+    setTimeout(() => {
+      btn.classList.remove('save-success');
+      btn.innerHTML = '<i class="bi bi-check2-circle me-2"></i>Save Business Profile';
+    }, 1800);
+  }
 
-  showToast('✅ Business profile saved to browser!');
+  // Try to save to Firestore if logged in
+  if (isUserLoggedIn()) {
+    saveBusinessProfileToFirestore(profile);
+  } else {
+    showToast('✅ Business profile saved to browser!', 'success');
+  }
+  
   updatePreview();
 }
 
@@ -145,10 +183,20 @@ function clearProfile() {
   localStorage.removeItem('invoiceflow_profile');
   resetLogoPreview();
   updatePreview();
-  showToast('Profile cleared.');
+  showToast('Profile cleared.', 'info');
 }
 
-/* ── Logo Preview ── */
+function bindSaveProfileBtn() {
+  const btn = document.getElementById('saveProfileBtn');
+  if (btn) btn.addEventListener('click', saveProfile);
+  
+  const clearBtn = document.getElementById('clearProfileBtn');
+  if (clearBtn) clearBtn.addEventListener('click', clearProfile);
+}
+
+/**
+ * ── Logo Preview ──
+ */
 function bindProfileLogo() {
   const input = document.getElementById('bLogoUrl');
   if (!input) return;
@@ -175,24 +223,28 @@ function resetLogoPreview() {
   if (placeholder) placeholder.style.display = 'flex';
 }
 
-/* ──────────────────────────────────────────
-   INVOICE ITEMS
-────────────────────────────────────────── */
-function addItem() {
+/**
+ * ───────────────────────────────────────────
+ * INVOICE ITEMS
+ * ───────────────────────────────────────────
+ */
+export function addItem() {
   itemCount++;
   const id = itemCount;
   const tbody = document.getElementById('itemsBody');
+  if (!tbody) return;
+  
   const tr = document.createElement('tr');
   tr.id = `item-row-${id}`;
   tr.dataset.itemId = id;
 
   tr.innerHTML = `
-    <td><input type="text" class="form-control item-name" placeholder="Item name" oninput="updateRowTotal(${id}); updatePreview();" /></td>
-    <td><input type="text" class="form-control item-desc" placeholder="Description" oninput="updatePreview();" /></td>
-    <td><input type="number" class="form-control item-qty" value="1" min="0" step="any" oninput="updateRowTotal(${id}); updatePreview();" /></td>
-    <td><input type="number" class="form-control item-price" value="0" min="0" step="any" oninput="updateRowTotal(${id}); updatePreview();" /></td>
+    <td><input type="text" class="form-control item-name" placeholder="Item name" oninput="window.invoice.updateRowTotal(${id}); window.invoice.updatePreview();" /></td>
+    <td><input type="text" class="form-control item-desc" placeholder="Description" oninput="window.invoice.updatePreview();" /></td>
+    <td><input type="number" class="form-control item-qty" value="1" min="0" step="any" oninput="window.invoice.updateRowTotal(${id}); window.invoice.updatePreview();" /></td>
+    <td><input type="number" class="form-control item-price" value="0" min="0" step="any" oninput="window.invoice.updateRowTotal(${id}); window.invoice.updatePreview();" /></td>
     <td>
-      <select class="form-control form-select item-gst" onchange="updateRowTotal(${id}); updatePreview();">
+      <select class="form-control form-select item-gst" onchange="window.invoice.updateRowTotal(${id}); window.invoice.updatePreview();">
         <option value="0">0%</option>
         <option value="5">5%</option>
         <option value="12">12%</option>
@@ -202,7 +254,7 @@ function addItem() {
     </td>
     <td class="item-total-cell" id="item-total-${id}">${currency} 0.00</td>
     <td>
-      <button class="btn-remove-item" onclick="removeItem(${id})" title="Remove item">
+      <button class="btn-remove-item" onclick="window.invoice.removeItem(${id})" title="Remove item">
         <i class="bi bi-x-circle-fill"></i>
       </button>
     </td>
@@ -212,7 +264,7 @@ function addItem() {
   updateAllTotals();
 }
 
-function removeItem(id) {
+export function removeItem(id) {
   const row = document.getElementById(`item-row-${id}`);
   if (row) {
     row.style.opacity = '0';
@@ -225,7 +277,7 @@ function removeItem(id) {
   }
 }
 
-function updateRowTotal(id) {
+export function updateRowTotal(id) {
   const row = document.getElementById(`item-row-${id}`);
   if (!row) return;
 
@@ -273,18 +325,19 @@ function updateAllTotals() {
   setText('prev_grand',    `${currency} ${grand.toFixed(2)}`);
 }
 
-/* ──────────────────────────────────────────
-   LIVE PREVIEW
-────────────────────────────────────────── */
+/**
+ * ───────────────────────────────────────────
+ * LIVE PREVIEW
+ * ───────────────────────────────────────────
+ */
 function bindLivePreview() {
-  // All text / date inputs
   document.querySelectorAll('input, textarea, select').forEach(el => {
     el.addEventListener('input', updatePreview);
     el.addEventListener('change', updatePreview);
   });
 }
 
-function updatePreview() {
+export function updatePreview() {
   // Business
   const bName = val('bName') || 'Your Business Name';
   setText('prev_bName',    bName);
@@ -367,7 +420,7 @@ function buildPreviewItems() {
     html += `
       <tr>
         <td>${idx + 1}</td>
-        <td><strong>${escHtml(name)}</strong>${desc ? `<br><span style="color:#9ca3af;font-size:10px">${escHtml(desc)}</span>` : ''}</td>
+        <td><strong>${escapeHtml(name)}</strong>${desc ? `<br><span style="color:#9ca3af;font-size:10px">${escapeHtml(desc)}</span>` : ''}</td>
         <td>${qty}</td>
         <td>${currency} ${price.toFixed(2)}</td>
         <td>${gst}%</td>
@@ -378,9 +431,11 @@ function buildPreviewItems() {
   tbody.innerHTML = html;
 }
 
-/* ──────────────────────────────────────────
-   DRAFT — SAVE / LOAD
-────────────────────────────────────────── */
+/**
+ * ───────────────────────────────────────────
+ * DRAFT — SAVE / LOAD
+ * ───────────────────────────────────────────
+ */
 const INVOICE_TEXT_FIELDS = [
   'invNumber','invDate','invDueDate',
   'cName','cPhone','cEmail','cAddress','cGst',
@@ -390,13 +445,11 @@ const INVOICE_TEXT_FIELDS = [
 function saveDraft() {
   const draft = {};
 
-  // Text fields
   INVOICE_TEXT_FIELDS.forEach(id => {
     const el = document.getElementById(id);
     if (el) draft[id] = el.value;
   });
 
-  // Items
   draft.items = [];
   document.querySelectorAll('#itemsBody tr').forEach(row => {
     draft.items.push({
@@ -411,11 +464,10 @@ function saveDraft() {
   draft.currency = currency;
   localStorage.setItem('invoiceflow_draft', JSON.stringify(draft));
 
-  // Increment invoice counter
   const match = draft.invNumber.match(/INV-\d{4}-(\d+)/);
   if (match) localStorage.setItem('invoiceflow_invCount', parseInt(match[1]));
 
-  showToast('💾 Draft saved to browser!');
+  showToast('💾 Draft saved to browser!', 'info');
 }
 
 function loadDraft() {
@@ -436,7 +488,6 @@ function loadDraft() {
     }
 
     if (draft.items && draft.items.length) {
-      // Clear existing rows first
       document.getElementById('itemsBody').innerHTML = '';
       itemCount = 0;
       draft.items.forEach(item => {
@@ -459,15 +510,16 @@ function loadDraft() {
   }
 }
 
-/* ── nav save draft shortcut ── */
 function bindNavSaveDraft() {
   const btn = document.getElementById('navSaveDraft');
   if (btn) btn.addEventListener('click', saveDraft);
 }
 
-/* ──────────────────────────────────────────
-   CLEAR INVOICE
-────────────────────────────────────────── */
+/**
+ * ───────────────────────────────────────────
+ * CLEAR INVOICE
+ * ───────────────────────────────────────────
+ */
 function clearInvoice() {
   if (!confirm('Clear all invoice data? (Business profile will be kept)')) return;
 
@@ -485,13 +537,20 @@ function clearInvoice() {
   updateAllTotals();
   updatePreview();
   localStorage.removeItem('invoiceflow_draft');
-  showToast('Invoice cleared.');
+  showToast('Invoice cleared.', 'info');
 }
 
-/* ──────────────────────────────────────────
-   PRINT
-────────────────────────────────────────── */
-function printInvoice() {
+const clearInvoiceBtn = document.getElementById('clearInvoiceBtn');
+if (clearInvoiceBtn) {
+  clearInvoiceBtn.addEventListener('click', clearInvoice);
+}
+
+/**
+ * ───────────────────────────────────────────
+ * PRINT
+ * ───────────────────────────────────────────
+ */
+export function printInvoice() {
   updatePreview();
   const preview = document.getElementById('invoiceDocument');
   if (!preview) {
@@ -502,10 +561,12 @@ function printInvoice() {
   setTimeout(() => window.print(), 100);
 }
 
-/* ──────────────────────────────────────────
-   DOWNLOAD PDF (html2pdf.js)
-────────────────────────────────────────── */
-function downloadPDF() {
+/**
+ * ───────────────────────────────────────────
+ * DOWNLOAD PDF (html2pdf.js)
+ * ───────────────────────────────────────────
+ */
+export function downloadPDF() {
   updatePreview();
   const element = document.getElementById('invoiceDocument');
   if (!element) {
@@ -521,7 +582,7 @@ function downloadPDF() {
   const clientName = val('cName') || 'client';
   const filename = `${invNumber}-${clientName.replace(/\s+/g,'-')}.pdf`;
 
-  showToast('📄 Generating PDF…');
+  showToast('📄 Generating PDF…', 'info');
 
   const opt = {
     margin:       [8, 8, 8, 8],
@@ -546,55 +607,46 @@ function downloadPDF() {
     });
 }
 
-/* ──────────────────────────────────────────
-   TOAST NOTIFICATION
-────────────────────────────────────────── */
-function showToast(msg, type = 'info') {
-  const toastEl = document.getElementById('appToast');
-  const msgEl   = document.getElementById('toastMsg');
-  if (!toastEl || !msgEl) return;
+/**
+ * ───────────────────────────────────────────
+ * HELPER UTILITIES
+ * ───────────────────────────────────────────
+ */
 
-  msgEl.textContent = msg;
-
-  // Color by type
-  toastEl.className = 'toast align-items-center';
-  if (type === 'success') toastEl.style.borderLeft = '3px solid #10b981';
-  else if (type === 'error') toastEl.style.borderLeft = '3px solid #ef4444';
-  else toastEl.style.borderLeft = '3px solid #6c47ff';
-
-  const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3000 });
-  bsToast.show();
-}
-
-/* ──────────────────────────────────────────
-   HELPER UTILITIES
-────────────────────────────────────────── */
-
-/** Get trimmed value from an element by ID */
 function val(id) {
   const el = document.getElementById(id);
   return el ? el.value.trim() : '';
 }
 
-/** Set text content safely */
 function setText(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
 }
 
-/** Format ISO date string to readable format */
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  try {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch (e) {
-    return dateStr;
-  }
-}
+/**
+ * ───────────────────────────────────────────
+ * EXPORT FOR GLOBAL ACCESS
+ * ───────────────────────────────────────────
+ */
+export default {
+  initInvoice,
+  addItem,
+  removeItem,
+  updateRowTotal,
+  updatePreview,
+  printInvoice,
+  downloadPDF
+};
 
-/** Escape HTML entities */
-function escHtml(str) {
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-  return String(str).replace(/[&<>"']/g, c => map[c]);
+// Make available globally for inline onclick handlers
+if (typeof window !== 'undefined') {
+  window.invoice = {
+    initInvoice,
+    addItem,
+    removeItem,
+    updateRowTotal,
+    updatePreview,
+    printInvoice,
+    downloadPDF
+  };
 }
